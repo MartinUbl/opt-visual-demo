@@ -1,0 +1,41 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
+PROJECT(optdemo CXX)
+
+IF(EMSCRIPTEN)
+    SET(MOREFLAGS "-pthread -sPTHREAD_POOL_SIZE=8 -sALLOW_MEMORY_GROWTH=1 -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -s USE_GLFW=3 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/assets -s 'EXPORTED_RUNTIME_METHODS=[\"HEAPF32\"]'")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MOREFLAGS}")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MOREFLAGS}")
+    SET(CMAKE_EXECUTABLE_SUFFIX ".html")
+ENDIF()
+
+SET(CMAKE_CXX_STANDARD 20)
+
+# Raylib
+INCLUDE(FetchContent)
+
+FetchContent_Declare(raylib
+    GIT_REPOSITORY "https://github.com/raysan5/raylib.git"
+    GIT_TAG "5.5"
+)
+
+FetchContent_MakeAvailable(raylib)
+
+FILE(GLOB src "${CMAKE_CURRENT_LIST_DIR}/src/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/src/*.h")
+FILE(GLOB_RECURSE src_core "${CMAKE_CURRENT_LIST_DIR}/src/Core/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/src/Core/*.h")
+FILE(GLOB_RECURSE src_opts "${CMAKE_CURRENT_LIST_DIR}/src/Optimizers/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/src/Optimizers/*.h")
+FILE(GLOB_RECURSE src_expr "${CMAKE_CURRENT_LIST_DIR}/src/Experiments/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/src/Experiments/*.h")
+
+SOURCE_GROUP("src" FILES ${src})
+SOURCE_GROUP("src\\Core" FILES ${src_core})
+SOURCE_GROUP("src\\Optimizers" FILES ${src_opts})
+SOURCE_GROUP("src\\Experiments" FILES ${src_expr})
+
+ADD_EXECUTABLE(${PROJECT_NAME} ${src} ${src_core} ${src_opts} ${src_expr})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} raylib)
+
+TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/assets/")
+
+SET_TARGET_PROPERTIES(
+    ${PROJECT_NAME} PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+)
