@@ -101,6 +101,8 @@ void GeneticAlgorithm::Optimize(const TOptimizer_Setup& setup, std::vector<doubl
 		Generate_Random_Individual(setup, i);
 	}
 
+	Apply_Population_Next();
+
 	if (!setup.initialGuess.empty() && setup.initialGuess.size() == paramCount) {
 		// Replace the first individual with the initial guess
 		mPopulation[0] = setup.initialGuess;
@@ -137,7 +139,6 @@ void GeneticAlgorithm::Optimize(const TOptimizer_Setup& setup, std::vector<doubl
 				mBestMetric = bestMetric;
 				mBest = bestParameters;
 			}
-			std::cout << "Iteration " << iter << ": New best metric = " << bestMetric << std::endl;
 		}
 
 		size_t topCount = setup.populationSize / 2;

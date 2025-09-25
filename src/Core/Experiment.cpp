@@ -49,9 +49,19 @@ bool Experiment::On_Render() {
 		Reset_Data();
 	}
 
-	TSimple_Button btnOptimize(GetScreenWidth() - 10 - 100, 90, 100, 30, "Optimize");
+	TSimple_Button btnOptimize(GetScreenWidth() - 10 - 100, 90, 100, 30, "Optimize fast");
 	if (btnOptimize.Render()) {
-		Start_Optimization();
+		Start_Optimization(TExperiment_Optimize_Mode::Fast);
+	}
+
+	TSimple_Button btnOptimizeMedium(GetScreenWidth() - 10 - 100, 130, 100, 30, "Optimize medium");
+	if (btnOptimizeMedium.Render()) {
+		Start_Optimization(TExperiment_Optimize_Mode::Medium);
+	}
+
+	TSimple_Button btnOptimizeSlow(GetScreenWidth() - 10 - 100, 170, 100, 30, "Optimize slow");
+	if (btnOptimizeSlow.Render()) {
+		Start_Optimization(TExperiment_Optimize_Mode::Slow);
 	}
 
 	if (mIs_Optimizing) {
@@ -94,7 +104,7 @@ void Experiment::Reset_Data() {
 	mOpt_BestMetric = std::numeric_limits<double>::infinity();
 }
 
-void Experiment::Start_Optimization() {
+void Experiment::Start_Optimization(TExperiment_Optimize_Mode mode) {
 	if (mIs_Optimizing) {
 		return;
 	}
@@ -108,7 +118,7 @@ void Experiment::Start_Optimization() {
 	}
 
 	mIs_Optimizing = true;
-	mOptimization_Thread = std::make_unique<std::thread>([this]() {
+	mOptimization_Thread = std::make_unique<std::thread>([this, mode]() {
 		// Prepare optimizer
 		TOptimizer_Setup setup;
 
@@ -116,12 +126,30 @@ void Experiment::Start_Optimization() {
 			return this->Objective_Function(params);
 		};
 
-		setup.callbackFunction = [this](NCallback_Stage stage, size_t iteration, double bestMetric, const std::vector<std::vector<double>>& population) {
+		setup.callbackFunction = [this, mode](NCallback_Stage stage, size_t iteration, double bestMetric, const std::vector<std::vector<double>>& population) {
 			// can be used to visualize the optimization process
-			std::lock_guard<std::mutex> lock(mCandidates_Mutex);
-			mCandidates = population;
-			mOpt_Iteration = iteration;
-			mOpt_BestMetric = bestMetric;
+			{
+				std::lock_guard<std::mutex> lock(mCandidates_Mutex);
+				mCandidates = population;
+				mOpt_Iteration = iteration;
+				mOpt_BestMetric = bestMetric;
+			}
+			// sleep a bit to allow visualization
+			if (mode == TExperiment_Optimize_Mode::Stepped) {
+				// in stepped mode, wait until the user clicks to proceed
+				/*while (mIs_Optimizing) {
+					if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+						break;
+					}
+					std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				}*/
+			}
+			else if (mode == TExperiment_Optimize_Mode::Slow) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
+			else if (mode == TExperiment_Optimize_Mode::Medium) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(30));
+			}
 			return NAction::Continue;
 		};
 

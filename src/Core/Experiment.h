@@ -1,3 +1,10 @@
+/**
+ * OptVisualDemo
+ *
+ * Copyright (c) 2025-present, Martin Ubl
+ * Distributed under the MIT license
+ */
+
 #pragma once
 
 #include <vector>
@@ -7,16 +14,17 @@
 #include <mutex>
 
 #include "Optimizer.h"
-/**
- * OptVisualDemo
- *
- * Copyright (c) 2025-present, Martin Ubl
- * Distributed under the MIT license
- */
 
 #include "../registration.h"
 
 struct TOptimizer_Setup;
+
+enum class TExperiment_Optimize_Mode {
+	Fast,
+	Medium,
+	Slow,
+	Stepped
+};
 
 /**
  * Base class for experiments
@@ -46,7 +54,7 @@ class Experiment {
 		virtual ~Experiment() = default;
 
 		// starts the optimization in a separate thread
-		void Start_Optimization();
+		void Start_Optimization(TExperiment_Optimize_Mode mode);
 
 	public:
 		// initialize experiment

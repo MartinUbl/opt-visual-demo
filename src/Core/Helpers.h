@@ -56,3 +56,36 @@ class TSimple_Button {
 		std::string mText;
 		NAppFont mAppFont = NAppFont::RegularText;
 };
+
+enum class NInput_Mask {
+	None,
+	Numeric
+};
+
+struct TSimple_Input_State {
+	bool isActive = false;
+	std::string text;
+};
+
+/**
+ * A simple input box UI element
+ */
+class TSimple_Input {
+	public:
+		TSimple_Input(int x, int y, int width, int height, const std::string& label, TSimple_Input_State& state, NAppFont appFont = NAppFont::RegularText, NInput_Mask inMask = NInput_Mask::None, int maxLength = -1)
+			: mRect{ static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height) }, mLabel(label), mState{ state }, mAppFont{ appFont }, mInMask{ inMask }, mMaxLength{ maxLength } {
+		}
+
+		bool Render();
+
+	private:
+		Rectangle mRect;
+		std::string mLabel;
+
+		NAppFont mAppFont = NAppFont::RegularText;
+		NInput_Mask mInMask = NInput_Mask::None;
+
+		int mMaxLength = -1; // -1 = no limit
+
+		TSimple_Input_State& mState;
+};

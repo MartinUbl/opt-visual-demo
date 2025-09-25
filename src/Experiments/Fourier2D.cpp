@@ -9,6 +9,7 @@
 
 #include <numbers>
 #include <thread>
+#include <chrono>
 
 #include "../Core/DrawProxy.h"
 #include "../Core/Optimizer.h"
@@ -20,7 +21,7 @@ namespace {
 
 	bool gen_audioDeviceInitialized = false;
 
-	constexpr size_t playbackTimeSecs = 4;
+	constexpr size_t playbackTimeSecs = 2;
 	constexpr unsigned int sampleRate = 44100;
 	constexpr double sampleRateFloat = static_cast<double>(sampleRate);
 
@@ -30,6 +31,8 @@ namespace {
 
 	AudioStream stream;
 	int gen_time = 0;
+
+	std::chrono::time_point<std::chrono::steady_clock> gen_startTime;
 
 	std::vector<short> gen_outBuffer;
 
@@ -96,6 +99,8 @@ void Fourier2D::Play_Sound() {
 		InitAudioDevice();
 	}
 
+	gen_startTime = std::chrono::steady_clock::now();
+
 	std::thread thr([]() {
 		// play sound using raylib and callback, that samples the best candidate
 		stream = LoadAudioStream(sampleRate, 16, 1);
@@ -155,7 +160,7 @@ void Fourier2D::Reset_Data() {
 
 bool Fourier2D::On_Render() {
 
-	TSimple_Button playBtn(GetScreenWidth() - 10 - 100, 130, 100, 30, "Play Sound");
+	TSimple_Button playBtn(GetScreenWidth() - 10 - 200 - 10, 50, 100, 30, "Play Sound");
 	if (playBtn.Render()) {
 		Play_Sound();
 	}
@@ -163,6 +168,14 @@ bool Fourier2D::On_Render() {
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !Is_Mouse_In_UI_Area()) {
 			mData_Points.push_back(From_Screen_To_Cartesian(GetMousePosition()));
 		}
+	}
+
+	if (gen_time != 0) {
+		const auto now = std::chrono::steady_clock::now();
+		const auto elapsed = now - gen_startTime;
+		const double soundPlayProgress = std::min(1.0, std::chrono::duration<double>(elapsed).count() / static_cast<double>(playbackTimeSecs));
+
+		DrawRectangle(GetScreenWidth() - 10 - 200 - 10, 50 + 30, static_cast<int>(100.0 * soundPlayProgress), 5, GREEN);
 	}
 
 	for (const auto& point : mData_Points) {

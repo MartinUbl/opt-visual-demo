@@ -10,6 +10,8 @@
 #include "Experiments/LinearModel2D.h"
 #include "Experiments/CircleModel2D.h"
 #include "Experiments/Fourier2D.h"
+#include "Experiments/Triangle2D.h"
+#include "Experiments/Logistic2D.h"
 
 #include <map>
 
@@ -18,4 +20,6 @@ const std::map<NExperiment, ExperimentDefinition> ExperimentFactories = {
 	{ NExperiment::CircleModel2D, { "Circle Model 2D", []() { return std::make_unique<CircleModel2D>(); } }},
 	{ NExperiment::Fourier2D_N2, { "Fourier Model 2D (N = 2)", []() { return std::make_unique<Fourier2D>(2); } }},
 	{ NExperiment::Fourier2D_N5, { "Fourier Model 2D (N = 5)", []() { return std::make_unique<Fourier2D>(5); } }},
+	{ NExperiment::Triangle2D, { "Triangle 2D", []() { return std::make_unique<Triangle2D>(); } }},
+	{ NExperiment::Logistic2D, { "Logistic Regression 2D", []() { return std::make_unique<Logistic2D>(); } }},
 };

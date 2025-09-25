@@ -11,6 +11,9 @@
 #include "Stage.h"
 #include "Experiment.h"
 
+constexpr int Window_Width = 1200;
+constexpr int Window_Height = 800;
+
 /**
  * Main application class, maintains the main loop and manages stages
  */

@@ -21,7 +21,7 @@ int Application::Run() {
 	// antialiasing
 	SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-	TWindow_Guard window(1200, 800, "OptVisualDemo");
+	TWindow_Guard window(Window_Width, Window_Height, "OptVisualDemo");
 
 	TFont_Ptr fnt = std::make_shared<TFont>("assets/OpenSans.ttf");
 
