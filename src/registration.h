@@ -19,6 +19,7 @@ enum class NExperiment {
 	Fourier2D_N5,
 	Triangle2D,
 	Logistic2D,
+	Clustering2D,
 };
 
 // available optimizers

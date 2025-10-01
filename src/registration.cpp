@@ -12,6 +12,7 @@
 #include "Experiments/Fourier2D.h"
 #include "Experiments/Triangle2D.h"
 #include "Experiments/Logistic2D.h"
+#include "Experiments/Clustering2D.h"
 
 #include <map>
 
@@ -22,4 +23,5 @@ const std::map<NExperiment, ExperimentDefinition> ExperimentFactories = {
 	{ NExperiment::Fourier2D_N5, { "Fourier Model 2D (N = 5)", []() { return std::make_unique<Fourier2D>(5); } }},
 	{ NExperiment::Triangle2D, { "Triangle 2D", []() { return std::make_unique<Triangle2D>(); } }},
 	{ NExperiment::Logistic2D, { "Logistic Regression 2D", []() { return std::make_unique<Logistic2D>(); } }},
+	{ NExperiment::Clustering2D, { "Clustering 2D", []() { return std::make_unique<Clustering2D>(); } }},
 };
