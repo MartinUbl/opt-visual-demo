@@ -49,6 +49,8 @@ class Experiment {
 		size_t mOpt_Iteration = 0;
 		double mOpt_BestMetric = std::numeric_limits<double>::infinity();
 
+		virtual void Cache_Best_Candidate(double bestMetric, const std::vector<std::vector<double>>& population) { }
+
 	public:
 		Experiment() = default;
 		virtual ~Experiment() = default;

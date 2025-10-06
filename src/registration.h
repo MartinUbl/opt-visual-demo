@@ -20,6 +20,7 @@ enum class NExperiment {
 	Triangle2D,
 	Logistic2D,
 	Clustering2D,
+	BallDrop2D,
 };
 
 // available optimizers

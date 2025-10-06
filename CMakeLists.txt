@@ -18,7 +18,13 @@ FetchContent_Declare(raylib
     GIT_TAG "5.5"
 )
 
-FetchContent_MakeAvailable(raylib)
+FetchContent_Declare(box2d
+    GIT_REPOSITORY "https://github.com/erincatto/box2d.git"
+    GIT_TAG "v3.1.1"
+)
+
+FetchContent_MakeAvailable(raylib box2d)
+INCLUDE_DIRECTORIES("${box2d_SOURCE_DIR}/include")
 
 FILE(GLOB src "${CMAKE_CURRENT_LIST_DIR}/src/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/src/*.h")
 FILE(GLOB_RECURSE src_core "${CMAKE_CURRENT_LIST_DIR}/src/Core/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/src/Core/*.h")
@@ -31,7 +37,7 @@ SOURCE_GROUP("src\\Optimizers" FILES ${src_opts})
 SOURCE_GROUP("src\\Experiments" FILES ${src_expr})
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${src} ${src_core} ${src_opts} ${src_expr})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} raylib)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} raylib box2d)
 
 TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/assets/")
 

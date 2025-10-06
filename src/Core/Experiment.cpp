@@ -23,7 +23,7 @@ bool Experiment::Is_Mouse_In_UI_Area() const {
 		return true;
 	}
 	// buttons on the top right
-	if (pos.x > GetScreenWidth() - 110 && pos.y < 120) {
+	if (pos.x > GetScreenWidth() - 110 && pos.y < 200) {
 		return true;
 	}
 
@@ -84,6 +84,7 @@ bool Experiment::On_Render() {
 	// back button
 	TSimple_Button btnBack(0, 0, 40, 40, "<", NAppFont::Title);
 	if (btnBack.Render()) {
+		Reset_Data();
 		Application::Instance().Request_Stage_Change(NStage::Menu);
 	}
 
@@ -150,6 +151,13 @@ void Experiment::Start_Optimization(TExperiment_Optimize_Mode mode) {
 			else if (mode == TExperiment_Optimize_Mode::Medium) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(30));
 			}
+
+			Cache_Best_Candidate(bestMetric, population);
+
+			if (!mIs_Optimizing) {
+				return NAction::Abort;
+			}
+
 			return NAction::Continue;
 		};
 
