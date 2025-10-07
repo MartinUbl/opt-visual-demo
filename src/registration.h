@@ -21,6 +21,7 @@ enum class NExperiment {
 	Logistic2D,
 	Clustering2D,
 	BallDrop2D,
+	NumPower,
 };
 
 // available optimizers

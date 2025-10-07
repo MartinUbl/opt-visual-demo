@@ -14,6 +14,7 @@
 #include "Experiments/Logistic2D.h"
 #include "Experiments/Clustering2D.h"
 #include "Experiments/BallDrop2D.h"
+#include "Experiments/NumPower.h"
 
 #include <map>
 
@@ -26,4 +27,5 @@ const std::map<NExperiment, ExperimentDefinition> ExperimentFactories = {
 	{ NExperiment::Logistic2D, { "Logistic Regression 2D", []() { return std::make_unique<Logistic2D>(); } }},
 	{ NExperiment::Clustering2D, { "Clustering 2D", []() { return std::make_unique<Clustering2D>(); } }},
 	{ NExperiment::BallDrop2D, { "Ball Drop 2D", []() { return std::make_unique<BallDrop2D>(); } }},
+	{ NExperiment::NumPower, { "x^2.1 (GP)", []() { return std::make_unique<NumPower>(); } }},
 };
