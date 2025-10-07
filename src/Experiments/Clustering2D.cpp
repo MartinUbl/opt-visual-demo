@@ -51,18 +51,24 @@ bool Clustering2D::On_Render() {
 	inputA.Render();
 
 	try {
-		int val = std::stoi(mInputState_Num_Centroids.text);
-		mNum_Centroids = std::max(2, std::min(15, val));
+		if (!mInputState_Num_Centroids.text.empty()) {
+			int val = std::stoi(mInputState_Num_Centroids.text);
+			mNum_Centroids = std::max(2, std::min(15, val));
 
-		if (val < 2) {
-			mInputState_Num_Centroids.text = "2";
+			if (val < 2) {
+				mInputState_Num_Centroids.text = "2";
+			}
+			else if (val > 15) {
+				mInputState_Num_Centroids.text = "15";
+			}
 		}
-		else if (val > 15) {
-			mInputState_Num_Centroids.text = "15";
+		else {
+			mNum_Centroids = 3;
+			mInputState_Num_Centroids.text = "3";
 		}
 	}
 	catch (...) {
-		mNum_Centroids = 100;
+		mNum_Centroids = 3;
 		if (mInputState_Num_Centroids.text.empty() && !mInputState_Num_Centroids.isActive) {
 			mInputState_Num_Centroids.text = "3";
 		}
@@ -72,38 +78,40 @@ bool Clustering2D::On_Render() {
 		mData_Points.push_back(GetMousePosition());
 	}
 
-	std::array<Color, 15> pointColors = { RED, GREEN, BLUE, ORANGE, PURPLE, YELLOW, PINK, SKYBLUE, VIOLET, LIME, GOLD, DARKGREEN, DARKBLUE, BROWN, MAROON };
+	if (mData_Points.size() > 0) {
+		std::array<Color, 15> pointColors = { RED, GREEN, BLUE, ORANGE, PURPLE, YELLOW, PINK, SKYBLUE, VIOLET, LIME, GOLD, DARKGREEN, DARKBLUE, BROWN, MAROON };
 
-	for (const auto& point : mData_Points) {
-		// select closest centroid to determine color
-		Color pointColor = LIGHTGRAY;
-		if (mCandidates.size() > 0) {
-			std::unique_lock<std::mutex> lock(mCandidates_Mutex, std::defer_lock);
-			if (mIs_Optimizing) {
-				lock.lock();
-			}
-			if (!mCandidates.empty()) {
-				const auto& bestCandidate = mCandidates[0];
-				double minDistSq = std::numeric_limits<double>::infinity();
-				int closestCentroidIdx = -1;
-				for (int i = 0; i < mNum_Centroids; ++i) {
-					double cx = bestCandidate[2 * i];
-					double cy = bestCandidate[2 * i + 1];
-					double dx = point.x - cx;
-					double dy = point.y - cy;
-					double distSq = dx * dx + dy * dy;
-					if (distSq < minDistSq) {
-						minDistSq = distSq;
-						closestCentroidIdx = i;
+		for (const auto& point : mData_Points) {
+			// select closest centroid to determine color
+			Color pointColor = LIGHTGRAY;
+			if (mCandidates.size() > 0) {
+				std::unique_lock<std::mutex> lock(mCandidates_Mutex, std::defer_lock);
+				if (mIs_Optimizing) {
+					lock.lock();
+				}
+				if (!mCandidates.empty()) {
+					const auto& bestCandidate = mCandidates[0];
+					double minDistSq = std::numeric_limits<double>::infinity();
+					int closestCentroidIdx = -1;
+					for (int i = 0; i < mNum_Centroids; ++i) {
+						double cx = bestCandidate[2 * i];
+						double cy = bestCandidate[2 * i + 1];
+						double dx = point.x - cx;
+						double dy = point.y - cy;
+						double distSq = dx * dx + dy * dy;
+						if (distSq < minDistSq) {
+							minDistSq = distSq;
+							closestCentroidIdx = i;
+						}
+					}
+					if (closestCentroidIdx >= 0 && closestCentroidIdx < static_cast<int>(pointColors.size())) {
+						pointColor = pointColors[closestCentroidIdx];
 					}
 				}
-				if (closestCentroidIdx >= 0 && closestCentroidIdx < static_cast<int>(pointColors.size())) {
-					pointColor = pointColors[closestCentroidIdx];
-				}
 			}
+
+			DrawCircleV(point, 3, pointColor);
 		}
-		
-		DrawCircleV(point, 3, pointColor);
 	}
 
 	return Experiment::On_Render();
